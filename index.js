@@ -24,10 +24,25 @@ app.get('/grades/:student_id/', async (req, res) => { // obsługa żądania GET 
     res.end(); // zakończenie odpowiedzi
 });
 
-app.post('/grades/:student_id/', async (req, res) => { // obsługa żądania POST na adresie /grades/:student_id/
-    const studentId = req.params.student_id; // pobranie parametru student_id z adresu
+app.post('/grades/:student_id/grades/', async (req, res) => { // obsługa żądania POST na adresie /grades/:student_id/
+    const studentId = parseInt(req.params.student_id); // pobranie parametru student_id z adresu
     console.log("Student ID: ", studentId); // wypisanie student_id w konsoli
     console.log("Request Body: ", req.body); // wypisanie ciała żądania w konsoli
+    if (studentId === null || !Number.isInteger(studentId) || !isFinite(studentId)){ // sprawdzenie czy student_id jest null
+        res.status(400).send('Student ID is required'); // wysłanie błędu 400
+        return; // zakończenie funkcji
+    }
+    if (req.body.course_id === null || !Number.isInteger(req.body.course_id) || !isFinite(req.body.course_id)) { // sprawdzenie czy course_id jest null
+        res.status(400).send('Course ID is required'); // wysłanie błędu 400
+        return; // zakończenie funkcji
+    }
+    if (req.body.grade === null || !Number.isInteger(req.body.grade) || !isFinite(req.body.grade)) { // sprawdzenie czy grade jest null
+        res.status(400).send('Grade is required'); // wysłanie błędu 400
+        return; // zakończenie funkcji
+    }
+    const query = 'INSERT INTO grades (student_id, course_id, grade) VALUES ($1, $2, $3)'; // zapytanie SQL do dodania oceny
+    const values = [studentId, courseId, grade]; // wartości do dodania
+    await client.query(query, values); // wykonanie zapytania
     res.end(); // zakończenie odpowiedzi
 });
 
